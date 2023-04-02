@@ -3,24 +3,26 @@ package memory
 import (
 	"context"
 	"github.com/jumagaliev1/one_sdu/lecture2/hw/internal/model"
+	"github.com/labstack/gommon/log"
 	"sync"
 )
 
 type Memory struct {
-	users map[int]*model.User //to do users
-	mu    sync.Mutex
+	users  map[int]*model.User //to do users
+	mu     sync.Mutex
+	logger *log.Logger
 }
 
-func New() *Memory {
+func New(logger *log.Logger) *Memory {
 	return &Memory{
-		users: make(map[int]*model.User),
+		users:  make(map[int]*model.User),
+		logger: logger,
 	}
 }
 
 func (r *Memory) Create(ctx context.Context, m map[string]interface{}) (*model.User, error) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
-	// logger
 
 	usr, err := model.NewUser(m)
 	if err != nil {
@@ -29,6 +31,7 @@ func (r *Memory) Create(ctx context.Context, m map[string]interface{}) (*model.U
 
 	for _, u := range r.users {
 		if u.Email == usr.Email {
+			r.logger.Error(model.ErrEmailAlreadyExists)
 			return nil, model.ErrEmailAlreadyExists
 		}
 	}
@@ -46,6 +49,7 @@ func (r *Memory) GetByID(ctx context.Context, id int) (*model.User, error) {
 
 	usr, ok := r.users[id]
 	if !ok {
+		r.logger.Error(model.ErrUserNotFound)
 		return nil, model.ErrUserNotFound
 	}
 

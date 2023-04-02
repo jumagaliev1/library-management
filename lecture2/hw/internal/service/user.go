@@ -6,24 +6,15 @@ import (
 	"github.com/jumagaliev1/one_sdu/lecture2/hw/internal/model"
 )
 
-//type IUserRepository interface {
-//	Create(ctx context.Context, m map[string]interface{}) (*model.User, error)
-//	GetByID(ctx context.Context, id int) (*model.User, error)
-//}
-//
-//type UserService struct {
-//	repo IUserRepository
-//}
-
 func (s *Service) GetByID(ctx context.Context, id int) (*model.User, error) {
 	usr, err := s.repo.GetByID(ctx, id)
 	if err != nil {
 		switch {
 		case errors.Is(err, model.ErrUserNotFound):
-			//logger
+			s.logger.Error(model.ErrUserNotFound)
 			return nil, err
 		default:
-			//logger
+			s.logger.Error(err)
 			return nil, err
 		}
 	}
@@ -36,10 +27,10 @@ func (s *Service) Create(ctx context.Context, input model.UserInput) (*model.Use
 	if err != nil {
 		switch {
 		case errors.Is(err, model.ErrEmailAlreadyExists):
-			// TO-DO logger
+			s.logger.Error(model.ErrEmailAlreadyExists)
 			return nil, err
 		default:
-			// TO-DO logger
+			s.logger.Error(err)
 			return nil, err
 		}
 	}
