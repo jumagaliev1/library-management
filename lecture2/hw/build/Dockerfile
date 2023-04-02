@@ -2,10 +2,9 @@ FROM golang:1.20.2-alpine3.16 AS builder
 
 WORKDIR /app
 
-COPY . .
-
-COPY go.mod go.sum ./
+COPY go.mod .
 RUN go mod download
+COPY . .
 RUN GOOS=linux go build -o ./app ./cmd/
 
 FROM alpine:latest
