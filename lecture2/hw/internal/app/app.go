@@ -4,12 +4,16 @@ import (
 	"fmt"
 	"github.com/jumagaliev1/one_sdu/lecture2/hw/internal/config"
 	"github.com/jumagaliev1/one_sdu/lecture2/hw/internal/service"
+	"github.com/jumagaliev1/one_sdu/lecture2/hw/internal/storage/user/memory"
 	_ "github.com/jumagaliev1/one_sdu/lecture2/hw/internal/storage/user/memory"
 	"github.com/jumagaliev1/one_sdu/lecture2/hw/internal/storage/user/postgre"
 	"github.com/jumagaliev1/one_sdu/lecture2/hw/internal/transport"
 	"github.com/jumagaliev1/one_sdu/lecture2/hw/internal/transport/handler"
 	client "github.com/jumagaliev1/one_sdu/lecture2/hw/pkg/database/postgre"
 	"github.com/labstack/gommon/log"
+	"os"
+	"os/signal"
+	"syscall"
 )
 
 func Run(log *log.Logger) {
@@ -24,13 +28,14 @@ func Run(log *log.Logger) {
 		return
 	}
 	log.Info("Successfully connect to Database")
-	r2 := postgre.New(postgreClient, log)
-	//r := memory.New(log)
-	s := service.New(r2, log)
+	postgre.New(postgreClient, log)
+	r := memory.New(log)
+	s := service.New(r, log)
 	h := handler.New(s, log)
 
 	e := transport.Init(h)
 
+	go GracefullyShutdown(log)
 	log.Info(fmt.Sprintf("running server on %v", cfg.Server.Port))
 	if err := e.Start(fmt.Sprint(":", cfg.Server.Port)); err != nil {
 		log.Error(err)
@@ -41,4 +46,19 @@ func Run(log *log.Logger) {
 	//if err := srv.ListenAndServe(); err != nil {
 	//	fmt.Print("Error in listen")
 	//}
+}
+
+func GracefullyShutdown(log *log.Logger) {
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
+
+	s := <-quit
+
+	//app.logger.PrintInfo("caught signal", map[string]string{
+	//	"signal": s.String(),
+	//})
+	//
+	log.Info(s.String())
+
+	os.Exit(0)
 }
