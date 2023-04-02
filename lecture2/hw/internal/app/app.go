@@ -32,7 +32,7 @@ func Run(log *log.Logger) {
 	e := transport.Init(h)
 
 	log.Info(fmt.Sprintf("running server on %v", cfg.Server.Port))
-	if err := e.Start(":8080"); err != nil {
+	if err := e.Start(fmt.Sprint(":", cfg.Server.Port)); err != nil {
 		log.Error(err)
 	}
 
