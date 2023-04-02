@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"github.com/jumagaliev1/one_sdu/lecture2/hw/internal/model"
+	"github.com/labstack/gommon/log"
 )
 
 type IRepository interface {
@@ -11,11 +12,13 @@ type IRepository interface {
 }
 
 type Service struct {
-	repo IRepository
+	repo   IRepository
+	logger *log.Logger
 }
 
-func New(repo IRepository) *Service {
+func New(repo IRepository, logger *log.Logger) *Service {
 	return &Service{
-		repo: repo,
+		repo:   repo,
+		logger: logger,
 	}
 }

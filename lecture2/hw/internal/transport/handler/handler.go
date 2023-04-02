@@ -3,6 +3,7 @@ package handler
 import (
 	"context"
 	"github.com/jumagaliev1/one_sdu/lecture2/hw/internal/model"
+	"github.com/labstack/gommon/log"
 )
 
 type IService interface {
@@ -12,10 +13,12 @@ type IService interface {
 
 type Handler struct {
 	service IService
+	logger  *log.Logger
 }
 
-func New(s IService) *Handler {
+func New(s IService, logger *log.Logger) *Handler {
 	return &Handler{
 		service: s,
+		logger:  logger,
 	}
 }
