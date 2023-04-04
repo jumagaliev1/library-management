@@ -5,12 +5,14 @@ import (
 	"github.com/jumagaliev1/one_sdu/lecture2/hw/internal/utils"
 	"github.com/labstack/gommon/log"
 	"github.com/subosito/gotenv"
+	"net"
 	"os"
 	"time"
 )
 
 const (
-	defaultHTTPPort = "8000"
+	defaultHTTPPort     = 8000
+	defaultShutDownTime = 10 * time.Second
 )
 
 type ServerConfig struct {
@@ -34,21 +36,18 @@ type Config struct {
 
 func (c PostgresConfig) URI() string {
 	return fmt.Sprintf(
-		"postgres://%s:%s@%s:%s/%s?sslmode=%s",
+		"postgres://%s:%s@%s/%s?sslmode=%s",
 		c.Username,
 		c.Password,
-		c.Host,
-		c.Port,
+		net.JoinHostPort(c.Host, c.Port),
 		c.Database,
 		c.SSLMode,
 	)
 }
 
 func Init(cfg *Config) {
-
 	cfg.Server.Port = utils.StrToInt(os.Getenv("SERVER_PORT"))
 	cfg.Server.Host = os.Getenv("SERVER_HOST")
-	//cfg.Server.ShutdownTimeout = os.Getenv("SERVER_SHUTDOWN_TIMEOUT")
 
 	cfg.Postgres.Username = os.Getenv("POSTGRES_USERNAME")
 	cfg.Postgres.Password = os.Getenv("POSTGRES_PASSWORD")
@@ -58,8 +57,15 @@ func Init(cfg *Config) {
 	cfg.Postgres.SSLMode = os.Getenv("POSTGRES_SSL_MODE")
 }
 
+func defaultInit(cfg *Config) {
+	cfg.Server.Port = defaultHTTPPort
+	cfg.Server.ShutdownTimeout = defaultShutDownTime
+}
+
 func New(path string, logger *log.Logger) (*Config, error) {
 	cfg := &Config{}
+
+	defaultInit(cfg)
 
 	if err := gotenv.Load(path + "/.env"); err != nil {
 		logger.Error(err)

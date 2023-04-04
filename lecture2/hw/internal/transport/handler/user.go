@@ -17,8 +17,11 @@ func (h *Handler) CreateUser(c echo.Context) error {
 	}
 
 	h.logger.Info("Input from request: ", input)
+
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+
 	defer cancel()
+
 	usr, err := h.service.Create(ctx, *input)
 	if err != nil {
 		h.logger.Error(err)
@@ -26,7 +29,6 @@ func (h *Handler) CreateUser(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, usr)
-
 }
 
 func (h *Handler) GetUser(c echo.Context) error {
@@ -36,15 +38,18 @@ func (h *Handler) GetUser(c echo.Context) error {
 
 		return err
 	}
+
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+
 	defer cancel()
 
 	usr, err := h.service.GetByID(ctx, id)
-	h.logger.Info("Get user from database", usr)
 	if err != nil {
 		h.logger.Error(err)
 		return err
 	}
+
+	h.logger.Info("Get user from database", usr)
 
 	return c.JSON(http.StatusOK, usr)
 }

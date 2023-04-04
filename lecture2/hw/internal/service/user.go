@@ -18,11 +18,13 @@ func (s *Service) GetByID(ctx context.Context, id int) (*model.User, error) {
 			return nil, err
 		}
 	}
+
 	return usr, nil
 }
 
 func (s *Service) Create(ctx context.Context, input model.UserInput) (*model.User, error) {
 	m := model.SetUser(input.FirstName, input.LastName, input.Email, input.Password)
+
 	usr, err := s.repo.Create(ctx, m)
 	if err != nil {
 		switch {
@@ -34,5 +36,6 @@ func (s *Service) Create(ctx context.Context, input model.UserInput) (*model.Use
 			return nil, err
 		}
 	}
+
 	return usr, err
 }

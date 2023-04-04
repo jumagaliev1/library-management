@@ -8,7 +8,7 @@ import (
 )
 
 type Memory struct {
-	users  map[int]*model.User //to do users
+	users  map[int]*model.User
 	mu     sync.Mutex
 	logger *log.Logger
 }
@@ -26,7 +26,7 @@ func (r *Memory) Create(ctx context.Context, m map[string]interface{}) (*model.U
 
 	usr, err := model.NewUser(m)
 	if err != nil {
-		return nil, err
+		return nil, model.ErrValidateUser
 	}
 
 	for _, u := range r.users {
