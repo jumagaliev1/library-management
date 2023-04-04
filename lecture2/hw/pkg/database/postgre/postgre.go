@@ -13,8 +13,11 @@ func NewClient(cfg config.PostgresConfig) (*sql.DB, error) {
 	if err != nil {
 		return nil, err
 	}
+
 	ctx, cancel := context.WithTimeout(context.Background(), cfg.PingTimeout+5*time.Second)
+
 	defer cancel()
+
 	err = postgre.PingContext(ctx)
 	if err != nil {
 		return nil, err

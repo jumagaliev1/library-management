@@ -43,10 +43,10 @@ func (r *Repository) Create(ctx context.Context, m map[string]interface{}) (*mod
 		m[model.EmailField],
 		m[model.PasswordField],
 	}
-	var id int
-	err := r.client.QueryRowContext(ctx, query, args...).Scan(&id)
 
-	m[model.IDField] = id
+	var id int
+
+	err := r.client.QueryRowContext(ctx, query, args...).Scan(&id)
 	if err != nil {
 		switch {
 		case err.Error() == ErrPQDuplicateEmail:
@@ -57,6 +57,8 @@ func (r *Repository) Create(ctx context.Context, m map[string]interface{}) (*mod
 			return nil, err
 		}
 	}
+
+	m[model.IDField] = id
 
 	usr, err := model.NewUser(m)
 	if err != nil {
@@ -80,6 +82,7 @@ func (r *Repository) GetByID(ctx context.Context, id int) (*model.User, error) {
 		&usr.Email,
 		&usr.Password,
 	)
+
 	if err != nil {
 		switch {
 		case errors.Is(err, sql.ErrNoRows):
@@ -93,5 +96,4 @@ func (r *Repository) GetByID(ctx context.Context, id int) (*model.User, error) {
 	}
 
 	return &usr, nil
-
 }
