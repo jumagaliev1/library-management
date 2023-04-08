@@ -14,7 +14,7 @@ import (
 	"os/signal"
 	"syscall"
 )
-
+// это лучше вынести в мейн
 func Run(log *log.Logger) {
 	cfg, err := config.New("configs/", log)
 	if err != nil {
@@ -31,7 +31,7 @@ func Run(log *log.Logger) {
 
 	log.Info("Successfully connect to Database")
 	postgre.New(postgreClient, log)
-	r := memory.New(log)
+	r := memory.New(log) // для переменных лучше использовать больше чем 1 букву)  
 	s := service.New(r, log)
 	h := handler.New(s, log)
 
