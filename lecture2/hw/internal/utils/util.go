@@ -3,7 +3,7 @@ package utils
 import (
 	"strconv"
 )
-
+// в го не используется папка utils
 func IntToString(n int) string {
 	return strconv.Itoa(n)
 }

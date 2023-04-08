@@ -12,7 +12,7 @@ const ENVIRONMENT = "DEV"
 
 func main() {
 	logger := log.New(ENVIRONMENT)
-	f, err := os.OpenFile(fmt.Sprint("logs/", time.Now()), os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
+	f, err := os.OpenFile(fmt.Sprint("logs/", time.Now()), os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)// зачем логи в файлах ? 
 
 	if err != nil {
 		logger.Error("Error opening file")

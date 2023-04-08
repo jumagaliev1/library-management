@@ -7,7 +7,7 @@ import (
 	_ "github.com/lib/pq"
 	"time"
 )
-
+// это должно быть в internal s
 func NewClient(cfg config.PostgresConfig) (*sql.DB, error) {
 	postgre, err := sql.Open("postgres", cfg.URI())
 	if err != nil {

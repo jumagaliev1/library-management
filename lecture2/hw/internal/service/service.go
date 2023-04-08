@@ -6,7 +6,7 @@ import (
 	"github.com/labstack/gommon/log"
 )
 
-type IRepository interface {
+type IRepository interface { // Привет от Николая Тузова ?) 
 	Create(ctx context.Context, m map[string]interface{}) (*model.User, error)
 	GetByID(ctx context.Context, id int) (*model.User, error)
 }
