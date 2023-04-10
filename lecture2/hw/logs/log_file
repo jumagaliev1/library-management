@@ -1,3 +1,0 @@
-{"time":"2023-04-04T12:16:39.738204978+06:00","level":"INFO","prefix":"DEV","file":"app.go","line":"30","message":"Successfully connect to Database"}
-{"time":"2023-04-04T12:16:39.738555404+06:00","level":"INFO","prefix":"DEV","file":"app.go","line":"39","message":"running server on 8000"}
-{"time":"2023-04-04T12:18:23.262177337+06:00","level":"INFO","prefix":"DEV","file":"app.go","line":"57","message":"interrupt"}
