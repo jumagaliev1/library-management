@@ -24,12 +24,12 @@ func New(cfg *config.Config, logger zap.SugaredLogger) *App {
 }
 
 func (a *App) Run(ctx context.Context) error {
-	storage, err := storage.New(ctx, a.cfg)
+	stg, err := storage.New(ctx, a.cfg)
 	if err != nil {
 		return err
 	}
 
-	svc, svcErr := service.New(storage, *a.cfg)
+	svc, svcErr := service.New(stg, *a.cfg)
 	if svcErr != nil {
 		return svcErr
 	}
