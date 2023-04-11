@@ -6,8 +6,20 @@ import (
 	"github.com/jumagaliev1/one_edu/internal/app"
 	"github.com/jumagaliev1/one_edu/internal/config"
 	"github.com/jumagaliev1/one_edu/internal/logger"
+
+	_ "github.com/jumagaliev1/one_edu/docs"
 )
 
+// @title OneLab Homework API
+// @version 1.0
+// @description This is a sample server for homework demo server.
+
+// @contact.name Alibi Zhumagaliyev
+// @contact.url @AZhumagaliyev
+// @contact.email alibi.zhumagaliyev@gmail.com
+
+// @host localhost:8000
+// @BasePath /api/v1
 func main() {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
