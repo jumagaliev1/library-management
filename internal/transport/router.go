@@ -22,5 +22,8 @@ func (s *Server) SetupRoutes() *echo.Group {
 
 	s.App.GET("/getHasBookUsers", s.handler.Borrow.GetNotReturned)
 	s.App.GET("/getLastMonthly", s.handler.Borrow.GetByLastMonth)
+
+	s.App.POST("/changePassword", s.handler.User.ChangePassword, s.jwt.ValidateAuth)
+
 	return v1
 }

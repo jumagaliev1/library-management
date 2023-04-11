@@ -17,6 +17,8 @@ type IUserService interface {
 	GenerateToken(user model.AuthUser) (string, error)
 	ParseToken(accessToken string) (string, error)
 	GetByUsername(ctx context.Context, username string) (*model.User, error)
+	GetUserFromRequest(ctx context.Context) string
+	ChangePassword(ctx context.Context, body model.PasswordReq) error
 }
 
 type IBookService interface {

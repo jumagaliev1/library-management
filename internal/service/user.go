@@ -116,3 +116,35 @@ func (s *UserService) ParseToken(accessToken string) (string, error) {
 func (s *UserService) GetByUsername(ctx context.Context, username string) (*model.User, error) {
 	return s.repo.User.GetByUsername(ctx, username)
 }
+
+func (s *UserService) GetUserFromRequest(ctx context.Context) string {
+	username, ok := ctx.Value(model.ContextUsername).(string)
+	if !ok {
+		fmt.Println("valid context username")
+		return ""
+	}
+
+	return username
+}
+
+func (s *UserService) ChangePassword(ctx context.Context, body model.PasswordReq) error {
+	username := s.GetUserFromRequest(ctx)
+	user, err := s.GetByUsername(ctx, username)
+	if err != nil {
+		return err
+	}
+
+	checkErr := s.CheckPassword(user.Password, body.OldPassword)
+	if checkErr != nil {
+		return checkErr
+	}
+
+	hash, err := s.HashPassword(body.Password)
+	if err != nil {
+		return err
+	}
+
+	user.Password = hash
+
+	return s.Update(ctx, *user)
+}

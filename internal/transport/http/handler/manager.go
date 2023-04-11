@@ -6,6 +6,7 @@ type IUserHandler interface {
 	Create(c echo.Context) error
 	Get(c echo.Context) error
 	Auth(c echo.Context) error
+	ChangePassword(c echo.Context) error
 }
 
 type IBookHandler interface {

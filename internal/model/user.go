@@ -41,3 +41,8 @@ type JWTClaim struct {
 func (jwt *JWTClaim) Valid() error {
 	return nil
 }
+
+type PasswordReq struct {
+	Password    string `json:"password"`
+	OldPassword string `json:"old_password"`
+}

@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"errors"
 	"fmt"
 	"github.com/jumagaliev1/one_edu/internal/model"
 	"github.com/jumagaliev1/one_edu/internal/service"
@@ -58,14 +57,23 @@ func (h *UserHandler) Auth(c echo.Context) error {
 }
 
 func (h *UserHandler) Get(c echo.Context) error {
-	claim := c.Request().Context().Value(model.ContextUsername)
-	username, ok := claim.(string)
-	if !ok {
-		return errors.New("cannot validate username")
-	}
+	username := h.service.User.GetUserFromRequest(c.Request().Context())
 	user, err := h.service.User.GetByUsername(c.Request().Context(), username)
 	if err != nil {
 		return err
 	}
 	return c.JSON(http.StatusOK, user)
+}
+
+func (h *UserHandler) ChangePassword(c echo.Context) error {
+	var body model.PasswordReq
+
+	if err := c.Bind(&body); err != nil {
+		return err
+	}
+	if err := h.service.User.ChangePassword(c.Request().Context(), body); err != nil {
+		return c.JSON(http.StatusBadRequest, err)
+
+	}
+	return c.JSON(http.StatusOK, "success")
 }
