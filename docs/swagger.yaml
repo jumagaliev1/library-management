@@ -13,6 +13,8 @@ definitions:
         type: string
       id:
         type: integer
+      price:
+        type: number
       title:
         type: string
     type: object
@@ -23,10 +25,34 @@ definitions:
       password:
         type: string
     type: object
+  model.Transaction:
+    properties:
+      ID:
+        type: integer
+      amount:
+        type: number
+      book_id:
+        type: integer
+      created_at:
+        type: string
+      deleted_at:
+        type: string
+      user_id:
+        type: integer
+    type: object
+  model.TransactionReq:
+    properties:
+      amount:
+        type: number
+      book_id:
+        type: integer
+    type: object
   model.User:
     properties:
       ID:
         type: integer
+      balance:
+        type: number
       email:
         type: string
       first_name:
@@ -118,6 +144,54 @@ paths:
       summary: Get Books borrowed last month
       tags:
       - borrow
+  /transaction:
+    delete:
+      consumes:
+      - application/json
+      description: Cancel Transaction
+      operationId: CamcelTransaction
+      parameters:
+      - description: Входящие данные
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: Cancel Transaction
+      tags:
+      - transaction
+    post:
+      consumes:
+      - application/json
+      description: Create Transaction
+      operationId: CreateTransaction
+      parameters:
+      - description: Входящие данные
+        in: body
+        name: rq
+        required: true
+        schema:
+          $ref: '#/definitions/model.TransactionReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Transaction'
+      security:
+      - ApiKeyAuth: []
+      summary: Create Transaction
+      tags:
+      - transaction
   /user:
     get:
       consumes:
@@ -131,6 +205,8 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/model.User'
+      security:
+      - ApiKeyAuth: []
       summary: Get User
       tags:
       - user
@@ -176,7 +252,15 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/model.User'
+      security:
+      - ApiKeyAuth: []
       summary: Change Password for user
       tags:
       - user
+securityDefinitions:
+  ApiKeyAuth:
+    description: OAuth protects our entity endpoints
+    in: header
+    name: Authorization
+    type: apiKey
 swagger: "2.0"

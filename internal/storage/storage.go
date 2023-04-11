@@ -31,11 +31,18 @@ type IBorrowRepository interface {
 	GetByTime(ctx context.Context) ([]model.Borrow, error)
 }
 
+type ITransactionRepository interface {
+	Create(ctx context.Context, transaction model.Transaction) (*model.Transaction, error)
+	GetByID(ctx context.Context, ID uint) (*model.Transaction, error)
+	Delete(ctx context.Context, transactionID uint) error
+}
+
 type Storage struct {
-	pg     *gorm.DB
-	Book   IBookRepository
-	User   IUserRepository
-	Borrow IBorrowRepository
+	pg          *gorm.DB
+	Book        IBookRepository
+	User        IUserRepository
+	Borrow      IBorrowRepository
+	Transaction ITransactionRepository
 }
 
 func New(ctx context.Context, cfg *config.Config) (*Storage, error) {
@@ -47,10 +54,13 @@ func New(ctx context.Context, cfg *config.Config) (*Storage, error) {
 	uRepo := postgre.NewUserRepository(pgDB)
 	bRepo := postgre.NewBookRepository(pgDB)
 	borrowRepo := postgre.NewBorrowRepository(pgDB)
+	transRepo := postgre.NewTransactionRepository(pgDB)
+
 	var storage Storage
 	storage.User = uRepo
 	storage.Book = bRepo
 	storage.Borrow = borrowRepo
+	storage.Transaction = transRepo
 
 	return &storage, nil
 }

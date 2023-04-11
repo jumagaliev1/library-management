@@ -109,8 +109,89 @@ const docTemplate = `{
                 }
             }
         },
+        "/transaction": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Create Transaction",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "transaction"
+                ],
+                "summary": "Create Transaction",
+                "operationId": "CreateTransaction",
+                "parameters": [
+                    {
+                        "description": "Входящие данные",
+                        "name": "rq",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.TransactionReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.Transaction"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Cancel Transaction",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "transaction"
+                ],
+                "summary": "Cancel Transaction",
+                "operationId": "CamcelTransaction",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Входящие данные",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
         "/user": {
             "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "Get User",
                 "consumes": [
                     "application/json"
@@ -168,6 +249,11 @@ const docTemplate = `{
         },
         "/user/password": {
             "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "Change Passowrd for user",
                 "consumes": [
                     "application/json"
@@ -223,6 +309,9 @@ const docTemplate = `{
                 "id": {
                     "type": "integer"
                 },
+                "price": {
+                    "type": "number"
+                },
                 "title": {
                     "type": "string"
                 }
@@ -239,11 +328,48 @@ const docTemplate = `{
                 }
             }
         },
+        "model.Transaction": {
+            "type": "object",
+            "properties": {
+                "ID": {
+                    "type": "integer"
+                },
+                "amount": {
+                    "type": "number"
+                },
+                "book_id": {
+                    "type": "integer"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "deleted_at": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "model.TransactionReq": {
+            "type": "object",
+            "properties": {
+                "amount": {
+                    "type": "number"
+                },
+                "book_id": {
+                    "type": "integer"
+                }
+            }
+        },
         "model.User": {
             "type": "object",
             "properties": {
                 "ID": {
                     "type": "integer"
+                },
+                "balance": {
+                    "type": "number"
                 },
                 "email": {
                     "type": "string"
@@ -278,6 +404,14 @@ const docTemplate = `{
                     "$ref": "#/definitions/model.User"
                 }
             }
+        }
+    },
+    "securityDefinitions": {
+        "ApiKeyAuth": {
+            "description": "OAuth protects our entity endpoints",
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
         }
     }
 }`

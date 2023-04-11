@@ -117,23 +117,25 @@ func (s *UserService) GetByUsername(ctx context.Context, username string) (*mode
 	return s.repo.User.GetByUsername(ctx, username)
 }
 
-func (s *UserService) GetUserFromRequest(ctx context.Context) string {
+func (s *UserService) GetUserFromRequest(ctx context.Context) (*model.User, error) {
 	username, ok := ctx.Value(model.ContextUsername).(string)
 	if !ok {
-		fmt.Println("valid context username")
-		return ""
+		return nil, errors.New("not valid context username")
 	}
 
-	return username
+	user, err := s.GetByUsername(ctx, username)
+	if err != nil {
+		return nil, err
+	}
+
+	return user, nil
 }
 
 func (s *UserService) ChangePassword(ctx context.Context, body model.PasswordReq) error {
-	username := s.GetUserFromRequest(ctx)
-	user, err := s.GetByUsername(ctx, username)
+	user, err := s.GetUserFromRequest(ctx)
 	if err != nil {
 		return err
 	}
-
 	checkErr := s.CheckPassword(user.Password, body.OldPassword)
 	if checkErr != nil {
 		return checkErr

@@ -13,6 +13,6 @@ func Dial(ctx context.Context, cfg config.PostgresConfig) (*gorm.DB, error) {
 	if err != nil {
 		return nil, err
 	}
-	err = db.AutoMigrate(&model.User{}, &model.Book{}, &model.Borrow{})
+	err = db.AutoMigrate(&model.User{}, &model.Book{}, &model.Borrow{}, &model.Transaction{})
 	return db, nil
 }

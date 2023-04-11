@@ -19,3 +19,8 @@ type IBorrowHandler interface {
 	GetNotReturned(c echo.Context) error
 	GetByLastMonth(c echo.Context) error
 }
+
+type ITransactionHandler interface {
+	Create(c echo.Context) error
+	Cancel(c echo.Context) error
+}

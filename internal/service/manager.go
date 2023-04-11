@@ -17,7 +17,7 @@ type IUserService interface {
 	GenerateToken(user model.AuthUser) (string, error)
 	ParseToken(accessToken string) (string, error)
 	GetByUsername(ctx context.Context, username string) (*model.User, error)
-	GetUserFromRequest(ctx context.Context) string
+	GetUserFromRequest(ctx context.Context) (*model.User, error)
 	ChangePassword(ctx context.Context, body model.PasswordReq) error
 }
 
@@ -35,4 +35,9 @@ type IBorrowService interface {
 type IUserBorrowService interface {
 	GetCurrentHaveBooks(ctx context.Context) ([]model.UserBorrow, error)
 	GetUserBookLastMonthly(ctx context.Context) ([]model.UserBorrow, error)
+}
+
+type ITransactionService interface {
+	Create(ctx context.Context, transaction model.Transaction) (*model.Transaction, error)
+	Cancel(ctx context.Context, transactionID uint) error
 }

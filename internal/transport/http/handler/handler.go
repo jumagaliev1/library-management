@@ -7,9 +7,10 @@ import (
 )
 
 type Handler struct {
-	User   IUserHandler
-	Book   IBookHandler
-	Borrow IBorrowHandler
+	User       IUserHandler
+	Book       IBookHandler
+	Borrow     IBorrowHandler
+	Transction ITransactionHandler
 }
 
 func New(service *service.Service, jwt *jwt.JWTAuth) (*Handler, error) {
@@ -19,11 +20,13 @@ func New(service *service.Service, jwt *jwt.JWTAuth) (*Handler, error) {
 	usr := NewUserHandler(service, jwt)
 	book := NewBookHandler(service)
 	borrow := NewBorrowHandler(service)
+	trans := NewTransactionHandler(service)
 	var handler Handler
 
 	handler.User = usr
 	handler.Book = book
 	handler.Borrow = borrow
+	handler.Transction = trans
 
 	return &handler, nil
 

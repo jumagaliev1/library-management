@@ -23,6 +23,7 @@ type User struct {
 	Username  string         `json:"username"`
 	Email     string         `json:"email"`
 	Password  string         `json:"password"`
+	Balance   float32        `json:"balance"`
 	PhotoURL  string         `json:"photo_URL"`
 }
 

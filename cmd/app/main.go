@@ -20,6 +20,11 @@ import (
 
 // @host localhost:8000
 // @BasePath /api/v1
+
+// @securityDefinitions.apikey ApiKeyAuth
+// @in header
+// @name Authorization
+// @description OAuth protects our entity endpoints
 func main() {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()

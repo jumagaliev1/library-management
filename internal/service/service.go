@@ -12,10 +12,11 @@ const (
 )
 
 type Service struct {
-	User       IUserService
-	Book       IBookService
-	Borrow     IBorrowService
-	UserBorrow IUserBorrowService
+	User        IUserService
+	Book        IBookService
+	Borrow      IBorrowService
+	UserBorrow  IUserBorrowService
+	Transaction ITransactionService
 }
 
 func New(repo *storage.Storage, cfg config.Config) (*Service, error) {
@@ -26,10 +27,12 @@ func New(repo *storage.Storage, cfg config.Config) (*Service, error) {
 	bkService := NewBookService(repo, cfg)
 	borrowService := NewBorrowService(repo, cfg)
 	userBorrowService := NewUserBorrowService(repo)
+	transService := NewTransactionService(repo, usrService)
 	return &Service{
-		User:       usrService,
-		Book:       bkService,
-		Borrow:     borrowService,
-		UserBorrow: userBorrowService,
+		User:        usrService,
+		Book:        bkService,
+		Borrow:      borrowService,
+		UserBorrow:  userBorrowService,
+		Transaction: transService,
 	}, nil
 }

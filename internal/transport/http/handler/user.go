@@ -78,6 +78,7 @@ func (h *UserHandler) Auth(c echo.Context) error {
 // Get User godoc
 // @Summary      Get User
 // @Description  Get User
+// @Security	ApiKeyAuth
 // @ID           GetUser
 // @Tags         user
 // @Accept       json
@@ -85,17 +86,18 @@ func (h *UserHandler) Auth(c echo.Context) error {
 // @Success	     200  {object}  model.User
 // @Router       /user [get]
 func (h *UserHandler) Get(c echo.Context) error {
-	username := h.service.User.GetUserFromRequest(c.Request().Context())
-	user, err := h.service.User.GetByUsername(c.Request().Context(), username)
+	user, err := h.service.User.GetUserFromRequest(c.Request().Context())
 	if err != nil {
 		return err
 	}
+
 	return c.JSON(http.StatusOK, user)
 }
 
 // ChangePasswordUser godoc
 // @Summary      Change Password for user
 // @Description  Change Passowrd for user
+// @Security	ApiKeyAuth
 // @ID           ChangePassword
 // @Tags         user
 // @Accept       json
