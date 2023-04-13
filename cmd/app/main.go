@@ -2,10 +2,10 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"github.com/jumagaliev1/one_edu/internal/app"
 	"github.com/jumagaliev1/one_edu/internal/config"
 	"github.com/jumagaliev1/one_edu/internal/logger"
+	"github.com/labstack/gommon/log"
 
 	_ "github.com/jumagaliev1/one_edu/docs"
 )
@@ -32,10 +32,10 @@ func main() {
 
 	cfg, err := config.New("configs/")
 	if err != nil {
-
+		log.Error(err)
 	}
 	a := app.New(cfg, logger.RequestLogger{})
 	if err := a.Run(ctx); err != nil {
-		fmt.Println("FATAL")
+		log.Fatal(err)
 	}
 }
