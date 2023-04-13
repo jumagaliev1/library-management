@@ -7,7 +7,7 @@ import (
 )
 
 func (s *Server) SetupRoutes() *echo.Group {
-	v1 := s.App.Group("/api/v1")
+	v1 := s.App.Group("/api/v1", s.middleware.RequestID)
 	s.App.GET("/ready", func(c echo.Context) error {
 		return c.NoContent(http.StatusOK)
 	})
@@ -25,8 +25,8 @@ func (s *Server) SetupRoutes() *echo.Group {
 	v1.GET("/getHasBookUsers", s.handler.Borrow.GetNotReturned)
 	v1.GET("/getLastMonthly", s.handler.Borrow.GetByLastMonth)
 
-	v1.POST("/transaction", s.handler.Transction.Create, s.jwt.ValidateAuth)
-	v1.DELETE("/transaction/:id", s.handler.Transction.Cancel, s.jwt.ValidateAuth)
+	v1.POST("/transaction", s.handler.Transaction.Create, s.jwt.ValidateAuth)
+	v1.DELETE("/transaction/:id", s.handler.Transaction.Cancel, s.jwt.ValidateAuth)
 
 	s.App.GET("/swagger/*", echoSwagger.WrapHandler)
 

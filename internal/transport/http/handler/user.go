@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"github.com/jumagaliev1/one_edu/internal/logger"
 	"github.com/jumagaliev1/one_edu/internal/model"
 	"github.com/jumagaliev1/one_edu/internal/service"
 	jwt "github.com/jumagaliev1/one_edu/internal/transport/middleware"
@@ -12,12 +13,14 @@ import (
 type UserHandler struct {
 	service *service.Service
 	jwt     *jwt.JWTAuth
+	logger  logger.RequestLogger
 }
 
-func NewUserHandler(service *service.Service, jwt *jwt.JWTAuth) *UserHandler {
+func NewUserHandler(service *service.Service, jwt *jwt.JWTAuth, logger logger.RequestLogger) *UserHandler {
 	return &UserHandler{
 		service: service,
 		jwt:     jwt,
+		logger:  logger,
 	}
 }
 
@@ -32,8 +35,10 @@ func NewUserHandler(service *service.Service, jwt *jwt.JWTAuth) *UserHandler {
 // @Success	     200  {object}  model.User
 // @Router       /user [post]
 func (h *UserHandler) Create(c echo.Context) error {
+	h.logger.Logger(c.Request().Context()).Info("creating user...")
 	var user model.User
 	if err := c.Bind(&user); err != nil {
+		h.logger.Logger(c.Request().Context()).Error(err)
 		return err
 	}
 	usr, err := h.service.User.Create(c.Request().Context(), user)
@@ -43,6 +48,7 @@ func (h *UserHandler) Create(c echo.Context) error {
 		case err == model.ErrDuplicateKey:
 			return c.JSON(http.StatusBadRequest, map[string]interface{}{"message": err.Error()})
 		}
+		h.logger.Logger(c.Request().Context()).Error(err)
 		return err
 	}
 
@@ -62,13 +68,16 @@ func (h *UserHandler) Create(c echo.Context) error {
 func (h *UserHandler) Auth(c echo.Context) error {
 	var input model.AuthUser
 	if err := c.Bind(&input); err != nil {
+		h.logger.Logger(c.Request().Context()).Error(err)
 		return err
 	}
 	if err := h.service.User.Auth(c.Request().Context(), input); err != nil {
+		h.logger.Logger(c.Request().Context()).Error(err)
 		return err
 	}
 	token, err := h.jwt.GenerateJWT(input.Username)
 	if err != nil {
+		h.logger.Logger(c.Request().Context()).Error(err)
 		return err
 	}
 
@@ -88,6 +97,7 @@ func (h *UserHandler) Auth(c echo.Context) error {
 func (h *UserHandler) Get(c echo.Context) error {
 	user, err := h.service.User.GetUserFromRequest(c.Request().Context())
 	if err != nil {
+		h.logger.Logger(c.Request().Context()).Error(err)
 		return err
 	}
 
@@ -109,11 +119,14 @@ func (h *UserHandler) ChangePassword(c echo.Context) error {
 	var body model.PasswordReq
 
 	if err := c.Bind(&body); err != nil {
+		h.logger.Logger(c.Request().Context()).Error(err)
 		return err
 	}
-	if err := h.service.User.ChangePassword(c.Request().Context(), body); err != nil {
-		return c.JSON(http.StatusBadRequest, err)
 
+	if err := h.service.User.ChangePassword(c.Request().Context(), body); err != nil {
+		h.logger.Logger(c.Request().Context()).Error(err)
+		return c.JSON(http.StatusBadRequest, err)
 	}
+
 	return c.JSON(http.StatusOK, "success")
 }

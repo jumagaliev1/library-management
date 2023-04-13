@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/golang-jwt/jwt"
 	"github.com/jumagaliev1/one_edu/internal/config"
+	"github.com/jumagaliev1/one_edu/internal/logger"
 	"github.com/jumagaliev1/one_edu/internal/model"
 	"github.com/jumagaliev1/one_edu/internal/storage"
 	"golang.org/x/crypto/bcrypt"
@@ -14,18 +15,21 @@ import (
 )
 
 type UserService struct {
-	repo *storage.Storage
-	cfg  config.Config
+	repo   *storage.Storage
+	cfg    config.Config
+	logger logger.RequestLogger
 }
 
-func NewUserService(repo *storage.Storage, cfg config.Config) *UserService {
-	return &UserService{repo: repo, cfg: cfg}
+func NewUserService(repo *storage.Storage, cfg config.Config, logger logger.RequestLogger) *UserService {
+	return &UserService{repo: repo, cfg: cfg, logger: logger}
 }
 
 func (s *UserService) Create(ctx context.Context, user model.User) (*model.User, error) {
 	var err error
 	user.Password, err = s.HashPassword(user.Password)
+	s.logger.Logger(ctx).Info("User password hash", user.Password)
 	if err != nil {
+		s.logger.Logger(ctx).Error(err)
 		return nil, err
 	}
 	return s.repo.User.Create(ctx, user)
@@ -58,10 +62,12 @@ func (s *UserService) HashPassword(password string) (string, error) {
 func (s *UserService) Auth(ctx context.Context, user model.AuthUser) error {
 	userFromDB, userErr := s.repo.User.GetByUsername(ctx, user.Username)
 	if userErr != nil {
+		s.logger.Logger(ctx).Error(userErr)
 		return userErr
 	}
 	checkErr := s.CheckPassword(userFromDB.Password, user.Password)
 	if checkErr != nil {
+		s.logger.Logger(ctx).Error(checkErr)
 		return checkErr
 	}
 
@@ -120,6 +126,7 @@ func (s *UserService) GetByUsername(ctx context.Context, username string) (*mode
 func (s *UserService) GetUserFromRequest(ctx context.Context) (*model.User, error) {
 	username, ok := ctx.Value(model.ContextUsername).(string)
 	if !ok {
+		s.logger.Logger(ctx).Error("not valid context username")
 		return nil, errors.New("not valid context username")
 	}
 
@@ -134,15 +141,18 @@ func (s *UserService) GetUserFromRequest(ctx context.Context) (*model.User, erro
 func (s *UserService) ChangePassword(ctx context.Context, body model.PasswordReq) error {
 	user, err := s.GetUserFromRequest(ctx)
 	if err != nil {
+		s.logger.Logger(ctx).Error(err)
 		return err
 	}
 	checkErr := s.CheckPassword(user.Password, body.OldPassword)
 	if checkErr != nil {
+		s.logger.Logger(ctx).Error(checkErr)
 		return checkErr
 	}
 
 	hash, err := s.HashPassword(body.Password)
 	if err != nil {
+		s.logger.Logger(ctx).Error(err)
 		return err
 	}
 

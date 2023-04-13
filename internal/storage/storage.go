@@ -3,6 +3,7 @@ package storage
 import (
 	"context"
 	"github.com/jumagaliev1/one_edu/internal/config"
+	"github.com/jumagaliev1/one_edu/internal/logger"
 	"github.com/jumagaliev1/one_edu/internal/model"
 	"github.com/jumagaliev1/one_edu/internal/storage/postgre"
 	"gorm.io/gorm"
@@ -45,16 +46,16 @@ type Storage struct {
 	Transaction ITransactionRepository
 }
 
-func New(ctx context.Context, cfg *config.Config) (*Storage, error) {
+func New(ctx context.Context, cfg *config.Config, logger logger.RequestLogger) (*Storage, error) {
 	pgDB, err := postgre.Dial(ctx, cfg.Postgres)
 	if err != nil {
 		return nil, err
 	}
 
-	uRepo := postgre.NewUserRepository(pgDB)
-	bRepo := postgre.NewBookRepository(pgDB)
-	borrowRepo := postgre.NewBorrowRepository(pgDB)
-	transRepo := postgre.NewTransactionRepository(pgDB)
+	uRepo := postgre.NewUserRepository(pgDB, logger)
+	bRepo := postgre.NewBookRepository(pgDB, logger)
+	borrowRepo := postgre.NewBorrowRepository(pgDB, logger)
+	transRepo := postgre.NewTransactionRepository(pgDB, logger)
 
 	var storage Storage
 	storage.User = uRepo

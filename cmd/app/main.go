@@ -27,14 +27,14 @@ import (
 // @description OAuth protects our entity endpoints
 func main() {
 	ctx, cancel := context.WithCancel(context.Background())
+
 	defer cancel()
 
 	cfg, err := config.New("configs/")
 	if err != nil {
 
 	}
-	_ = logger.Logger(ctx)
-	a := app.New(cfg, logger.Logger(ctx))
+	a := app.New(cfg, logger.RequestLogger{})
 	if err := a.Run(ctx); err != nil {
 		fmt.Println("FATAL")
 	}

@@ -2,21 +2,24 @@ package service
 
 import (
 	"context"
+	"github.com/jumagaliev1/one_edu/internal/logger"
 	"github.com/jumagaliev1/one_edu/internal/model"
 	"github.com/jumagaliev1/one_edu/internal/storage"
 )
 
 type UserBorrowService struct {
-	repo *storage.Storage
+	repo   *storage.Storage
+	logger logger.RequestLogger
 }
 
-func NewUserBorrowService(repo *storage.Storage) *UserBorrowService {
-	return &UserBorrowService{repo: repo}
+func NewUserBorrowService(repo *storage.Storage, logger logger.RequestLogger) *UserBorrowService {
+	return &UserBorrowService{repo: repo, logger: logger}
 }
 
 func (s *UserBorrowService) GetCurrentHaveBooks(ctx context.Context) ([]model.UserBorrow, error) {
 	borrows, err := s.repo.Borrow.GetNoReturned(ctx)
 	if err != nil {
+		s.logger.Logger(ctx).Error(err)
 		return nil, err
 	}
 
@@ -26,6 +29,7 @@ func (s *UserBorrowService) GetCurrentHaveBooks(ctx context.Context) ([]model.Us
 func (s *UserBorrowService) GetUserBookLastMonthly(ctx context.Context) ([]model.UserBorrow, error) {
 	borrows, err := s.repo.Borrow.GetByTime(ctx)
 	if err != nil {
+		s.logger.Logger(ctx).Error(err)
 		return nil, err
 	}
 
@@ -45,11 +49,13 @@ func (s *UserBorrowService) GroupBy(ctx context.Context, borrows []model.Borrow)
 	for userID := range currentBorrows {
 		user, err := s.repo.User.GetByID(ctx, userID)
 		if err != nil {
+			s.logger.Logger(ctx).Error(err)
 			return nil, err
 		}
 		for _, bookID := range currentBorrows[userID] {
 			book, err := s.repo.Book.GetByID(ctx, bookID)
 			if err != nil {
+				s.logger.Logger(ctx).Error(err)
 				return nil, err
 			}
 			res[*user] = append(res[*user], *book)

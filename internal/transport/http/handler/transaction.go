@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"github.com/jumagaliev1/one_edu/internal/logger"
 	"github.com/jumagaliev1/one_edu/internal/model"
 	"github.com/jumagaliev1/one_edu/internal/service"
 	"github.com/labstack/echo/v4"
@@ -10,10 +11,14 @@ import (
 
 type TransactionHandler struct {
 	service *service.Service
+	logger  logger.RequestLogger
 }
 
-func NewTransactionHandler(service *service.Service) *TransactionHandler {
-	return &TransactionHandler{service: service}
+func NewTransactionHandler(service *service.Service, logger logger.RequestLogger) *TransactionHandler {
+	return &TransactionHandler{
+		service: service,
+		logger:  logger,
+	}
 }
 
 // CreateTransaction godoc
@@ -31,6 +36,7 @@ func (h *TransactionHandler) Create(c echo.Context) error {
 	var body model.TransactionReq
 
 	if err := c.Bind(&body); err != nil {
+		h.logger.Logger(c.Request().Context()).Error(err)
 		return c.JSON(http.StatusBadRequest, err)
 	}
 	transaction := &model.Transaction{
@@ -39,6 +45,7 @@ func (h *TransactionHandler) Create(c echo.Context) error {
 	}
 	transaction, err := h.service.Transaction.Create(c.Request().Context(), *transaction)
 	if err != nil {
+		h.logger.Logger(c.Request().Context()).Error(err)
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
 
@@ -60,12 +67,14 @@ func (h *TransactionHandler) Cancel(c echo.Context) error {
 	var ID uint
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
+		h.logger.Logger(c.Request().Context()).Error(err)
 		return err
 	}
 	ID = uint(id)
 
 	err = h.service.Transaction.Cancel(c.Request().Context(), ID)
 	if err != nil {
+		h.logger.Logger(c.Request().Context()).Error(err)
 		return err
 	}
 

@@ -3,6 +3,7 @@ package service
 import (
 	"errors"
 	"github.com/jumagaliev1/one_edu/internal/config"
+	"github.com/jumagaliev1/one_edu/internal/logger"
 	"github.com/jumagaliev1/one_edu/internal/storage"
 	"time"
 )
@@ -19,15 +20,15 @@ type Service struct {
 	Transaction ITransactionService
 }
 
-func New(repo *storage.Storage, cfg config.Config) (*Service, error) {
+func New(repo *storage.Storage, cfg config.Config, logger logger.RequestLogger) (*Service, error) {
 	if repo == nil {
 		return nil, errors.New("No storage")
 	}
-	usrService := NewUserService(repo, cfg)
-	bkService := NewBookService(repo, cfg)
-	borrowService := NewBorrowService(repo, cfg)
-	userBorrowService := NewUserBorrowService(repo)
-	transService := NewTransactionService(repo, usrService)
+	usrService := NewUserService(repo, cfg, logger)
+	bkService := NewBookService(repo, cfg, logger)
+	borrowService := NewBorrowService(repo, cfg, logger)
+	userBorrowService := NewUserBorrowService(repo, logger)
+	transService := NewTransactionService(repo, usrService, logger)
 	return &Service{
 		User:        usrService,
 		Book:        bkService,

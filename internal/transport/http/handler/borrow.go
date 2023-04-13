@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"github.com/jumagaliev1/one_edu/internal/logger"
 	"github.com/jumagaliev1/one_edu/internal/model"
 	"github.com/jumagaliev1/one_edu/internal/service"
 	"github.com/labstack/echo/v4"
@@ -9,21 +10,27 @@ import (
 
 type BorrowHandler struct {
 	service *service.Service
+	logger  logger.RequestLogger
 }
 
-func NewBorrowHandler(service *service.Service) *BorrowHandler {
-	return &BorrowHandler{service: service}
+func NewBorrowHandler(service *service.Service, logger logger.RequestLogger) *BorrowHandler {
+	return &BorrowHandler{
+		service: service,
+		logger:  logger,
+	}
 }
 
 func (h *BorrowHandler) Create(c echo.Context) error {
 	var body model.Borrow
 
 	if err := c.Bind(&body); err != nil {
+		h.logger.Logger(c.Request().Context()).Error(err)
 		return err
 	}
 
 	borrow, err := h.service.Borrow.Create(c.Request().Context(), body)
 	if err != nil {
+		h.logger.Logger(c.Request().Context()).Error(err)
 		return err
 	}
 
@@ -42,6 +49,7 @@ func (h *BorrowHandler) Create(c echo.Context) error {
 func (h *BorrowHandler) GetNotReturned(c echo.Context) error {
 	borrows, err := h.service.UserBorrow.GetCurrentHaveBooks(c.Request().Context())
 	if err != nil {
+		h.logger.Logger(c.Request().Context()).Error(err)
 		return err
 	}
 
@@ -60,6 +68,7 @@ func (h *BorrowHandler) GetNotReturned(c echo.Context) error {
 func (h *BorrowHandler) GetByLastMonth(c echo.Context) error {
 	borrows, err := h.service.UserBorrow.GetUserBookLastMonthly(c.Request().Context())
 	if err != nil {
+		h.logger.Logger(c.Request().Context()).Error(err)
 		return err
 	}
 

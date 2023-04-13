@@ -3,33 +3,38 @@ package service
 import (
 	"context"
 	"errors"
+	"github.com/jumagaliev1/one_edu/internal/logger"
 	"github.com/jumagaliev1/one_edu/internal/model"
 	"github.com/jumagaliev1/one_edu/internal/storage"
 )
 
 type TransactionService struct {
-	repo *storage.Storage
-	user *UserService
+	repo   *storage.Storage
+	user   *UserService
+	logger logger.RequestLogger
 }
 
-func NewTransactionService(repo *storage.Storage, user *UserService) *TransactionService {
-	return &TransactionService{repo: repo, user: user}
+func NewTransactionService(repo *storage.Storage, user *UserService, logger logger.RequestLogger) *TransactionService {
+	return &TransactionService{repo: repo, user: user, logger: logger}
 }
 
 func (s *TransactionService) Create(ctx context.Context, transaction model.Transaction) (*model.Transaction, error) {
 	user, err := s.user.GetUserFromRequest(ctx)
 	if err != nil {
+		s.logger.Logger(ctx).Error(err)
 		return nil, err
 	}
 
 	transaction.UserID = user.ID
 
 	if !s.checkBalance(*user, transaction.Amount) {
-		return nil, errors.New("not enoguh money")
+		s.logger.Logger(ctx).Error("not enough money")
+		return nil, errors.New("not enough money")
 	}
 
 	s.updateBalance(user, -transaction.Amount)
 	if err := s.repo.User.Update(ctx, *user); err != nil {
+		s.logger.Logger(ctx).Error(err)
 		return nil, err
 	}
 
@@ -44,11 +49,13 @@ func (s *TransactionService) GetByID(ctx context.Context, ID uint) (*model.Trans
 func (s *TransactionService) Cancel(ctx context.Context, transactionID uint) error {
 	transaction, err := s.GetByID(ctx, transactionID)
 	if err != nil {
+		s.logger.Logger(ctx).Error(err)
 		return err
 	}
 
 	user, err := s.user.GetUserFromRequest(ctx)
 	if err != nil {
+		s.logger.Logger(ctx).Error(err)
 		return err
 	}
 	transaction.UserID = user.ID
@@ -56,6 +63,7 @@ func (s *TransactionService) Cancel(ctx context.Context, transactionID uint) err
 	s.updateBalance(user, transaction.Amount)
 
 	if err := s.repo.User.Update(ctx, *user); err != nil {
+		s.logger.Logger(ctx).Error(err)
 		return err
 	}
 

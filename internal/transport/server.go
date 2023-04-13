@@ -5,23 +5,24 @@ import (
 	"fmt"
 	"github.com/jumagaliev1/one_edu/internal/config"
 	"github.com/jumagaliev1/one_edu/internal/transport/http/handler"
-	jwt "github.com/jumagaliev1/one_edu/internal/transport/middleware"
+	middleware "github.com/jumagaliev1/one_edu/internal/transport/middleware"
 	"github.com/labstack/echo/v4"
-	"github.com/labstack/echo/v4/middleware"
+	echoMiddleware "github.com/labstack/echo/v4/middleware"
 	"github.com/labstack/gommon/log"
 	"net/http"
 	"time"
 )
 
 type Server struct {
-	cfg     *config.Config
-	App     *echo.Echo
-	handler *handler.Handler
-	jwt     *jwt.JWTAuth
+	cfg        *config.Config
+	App        *echo.Echo
+	handler    *handler.Handler
+	jwt        *middleware.JWTAuth
+	middleware middleware.Middleware
 }
 
-func NewServer(cfg *config.Config, handler *handler.Handler, jwt *jwt.JWTAuth) *Server {
-	return &Server{cfg: cfg, handler: handler, jwt: jwt}
+func NewServer(cfg *config.Config, handler *handler.Handler, jwt *middleware.JWTAuth, midlwr middleware.Middleware) *Server {
+	return &Server{cfg: cfg, handler: handler, jwt: jwt, middleware: midlwr}
 }
 
 func (s *Server) StartHTTPServer(ctx context.Context) error {
@@ -51,17 +52,16 @@ func (s *Server) StartHTTPServer(ctx context.Context) error {
 
 func (s *Server) BuildEngine() *echo.Echo {
 	e := echo.New()
-	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
+	e.Use(echoMiddleware.CORSWithConfig(echoMiddleware.CORSConfig{
 		AllowOrigins: []string{"*"},
 		AllowHeaders: []string{"*"},
 	}))
-	e.Use(middleware.RequestID())
-	e.Use(middleware.RequestLoggerWithConfig(middleware.RequestLoggerConfig{
+	//e.Use(echoMiddleware.RequestID())
+	e.Use(echoMiddleware.RequestLoggerWithConfig(echoMiddleware.RequestLoggerConfig{
 		LogURI:    true,
 		LogStatus: true,
-		LogValuesFunc: func(c echo.Context, v middleware.RequestLoggerValues) error {
+		LogValuesFunc: func(c echo.Context, v echoMiddleware.RequestLoggerValues) error {
 			log.Info(map[string]interface{}{"URI": v.URI, "status": v.Status})
-
 			return nil
 		},
 	}))
