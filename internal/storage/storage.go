@@ -6,7 +6,6 @@ import (
 	"github.com/jumagaliev1/one_edu/internal/logger"
 	"github.com/jumagaliev1/one_edu/internal/model"
 	"github.com/jumagaliev1/one_edu/internal/storage/postgre"
-	"gorm.io/gorm"
 )
 
 type IBookRepository interface {
@@ -39,7 +38,6 @@ type ITransactionRepository interface {
 }
 
 type Storage struct {
-	pg          *gorm.DB
 	Book        IBookRepository
 	User        IUserRepository
 	Borrow      IBorrowRepository

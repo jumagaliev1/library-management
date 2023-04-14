@@ -27,9 +27,9 @@ func NewUserService(repo *storage.Storage, cfg config.Config, logger logger.Requ
 func (s *UserService) Create(ctx context.Context, user model.User) (*model.User, error) {
 	var err error
 	user.Password, err = s.HashPassword(user.Password)
-	s.logger.Logger(ctx).Info("User password hash", user.Password)
+	//s.logger.Logger(ctx).Info("User password hash", user.Password)
 	if err != nil {
-		s.logger.Logger(ctx).Error(err)
+		//s.logger.Logger(ctx).Error(err)
 		return nil, err
 	}
 	return s.repo.User.Create(ctx, user)
