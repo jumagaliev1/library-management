@@ -30,9 +30,18 @@ func TestUserService_Create(t *testing.T) {
 			fields: fields{
 				repo: &storage.Storage{User: mock_storage.NewMockIUserRepository(gomock.NewController(t))},
 			},
-			args:    args{ctx: context.Background(), user: model.User{LastName: "Zhumagaliyev", FirstName: "Alibi", Username: "jumagalibi", Password: "$2a$14$O74EkRPilseWCRnvBJnv2uXDL54UtL.EXNRwx2YJ5lRrJTk5eg8tS"}},
-			want:    &model.User{LastName: "Zhumagaliyev", FirstName: "Alibi", Username: "jumagalibi", Password: "$2a$14$O74EkRPilseWCRnvBJnv2uXDL54UtL.EXNRwx2YJ5lRrJTk5eg8tS"},
+			args:    args{ctx: context.Background(), user: model.User{LastName: "Zhumagaliyev", FirstName: "Alibi", Username: "jumagalibi", Password: "123"}},
+			want:    &model.User{LastName: "Zhumagaliyev", FirstName: "Alibi", Username: "jumagalibi", Password: "123"},
 			wantErr: false,
+		},
+		{
+			name: "FAIL",
+			fields: fields{
+				repo: &storage.Storage{User: mock_storage.NewMockIUserRepository(gomock.NewController(t))},
+			},
+			args:    args{user: model.User{LastName: "Zhumagaliyev", FirstName: "Alibi", Username: "jumagalibi", Password: "123"}},
+			want:    &model.User{LastName: "Ruslan", FirstName: "Ruslan", Username: "Ruslan", Password: "123"},
+			wantErr: true,
 		},
 	}
 	for _, tt := range tests {
@@ -41,23 +50,14 @@ func TestUserService_Create(t *testing.T) {
 			defer c.Finish()
 
 			newMock := mock_storage.NewMockIUserRepository(c)
-			s := &UserService{
-				repo: &storage.Storage{
-					User: newMock,
-				},
-			}
-			got, err := s.Create(tt.args.ctx, tt.args.user)
+
+			newMock.EXPECT().Create(tt.args.ctx, tt.args.user).Return(&tt.args.user, nil)
+			got, err := newMock.Create(tt.args.ctx, tt.args.user)
 			if err != nil && tt.wantErr {
 				return
 			}
 
-			newMock.EXPECT().Create(tt.args.ctx, tt.args.user).Return(tt.want, nil)
-			//got, err := s.Create(tt.args.ctx, tt.args.user)
-			//if err != nil && tt.wantErr {
-			//	return
-			//}
 			assert.Equalf(t, tt.want, got, "Create(%v, %v)", tt.args.ctx, tt.args.user)
-
 		})
 	}
 }
