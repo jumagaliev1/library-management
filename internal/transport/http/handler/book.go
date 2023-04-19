@@ -20,9 +20,25 @@ func NewBookHandler(service *service.Service, logger logger.RequestLogger) *Book
 	}
 }
 
+// Create Book godoc
+// @Summary      Create Book
+// @Description  Create Book
+// @ID           CreateBook
+// @Tags         book
+// @Accept       json
+// @Produce      json
+// @Param        rq   body      model.BookReq true  "Входящие данные"
+// @Success	     200  {object}  string
+// @Router       /book [post]
 func (h *BookHandler) Create(c echo.Context) error {
-	var input model.Book
-	book, err := h.service.Book.Create(c.Request().Context(), input)
+	var input model.BookReq
+
+	if err := c.Bind(&input); err != nil {
+		h.logger.Logger(c.Request().Context()).Error(err)
+		return err
+	}
+
+	book, err := h.service.Book.Create(c.Request().Context(), *input.MapperToBook())
 	if err != nil {
 		h.logger.Logger(c.Request().Context()).Error(err)
 		return err
@@ -40,4 +56,22 @@ func (h *BookHandler) Get(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, book)
+}
+
+// Get All Book godoc
+// @Summary      Get all Book
+// @Description  Get all Book
+// @ID           GetAllBook
+// @Tags         book
+// @Accept       json
+// @Produce      json
+// @Success	     200  {object}  string
+// @Router       /book [get]
+func (h *BookHandler) GetAll(c echo.Context) error {
+	books, err := h.service.Book.GetAll(c.Request().Context())
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, err)
+	}
+
+	return c.JSON(http.StatusOK, books)
 }

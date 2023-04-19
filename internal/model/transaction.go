@@ -14,8 +14,14 @@ type Transaction struct {
 type TransactionReq struct {
 	BookID uint    `json:"book_id"`
 	Amount float32 `json:"amount"`
+	UserID uint    `json:"user_id"`
 }
 
 type TransactionCancelReq struct {
 	TransactionID uint `json:"transaction_id"`
+}
+
+type IncrementBalanceReq struct {
+	UserID uint `json:"user_id"`
+	Amount int  `json:"amount"`
 }

@@ -55,9 +55,9 @@ const docTemplate = `{
                 }
             }
         },
-        "/getHasBookUsers": {
-            "get": {
-                "description": "Get not Returned books for user",
+        "/balance": {
+            "post": {
+                "description": "Increment Balance",
                 "consumes": [
                     "application/json"
                 ],
@@ -65,18 +65,83 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "borrow"
+                    "transaction"
                 ],
-                "summary": "Get not Returned books for user",
-                "operationId": "Get not Returned books",
+                "summary": "Increment Balance",
+                "operationId": "IncrementBalance",
+                "parameters": [
+                    {
+                        "description": "Входящие данные",
+                        "name": "rq",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.IncrementBalanceReq"
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/model.UserBorrow"
-                            }
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/book": {
+            "get": {
+                "description": "Get all Book",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "book"
+                ],
+                "summary": "Get all Book",
+                "operationId": "GetAllBook",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Create Book",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "book"
+                ],
+                "summary": "Create Book",
+                "operationId": "CreateBook",
+                "parameters": [
+                    {
+                        "description": "Входящие данные",
+                        "name": "rq",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.BookReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
                         }
                     }
                 }
@@ -103,6 +168,60 @@ const docTemplate = `{
                             "type": "array",
                             "items": {
                                 "$ref": "#/definitions/model.UserBorrow"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/getNotReturned": {
+            "get": {
+                "description": "Get not Returned books for user",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "borrow"
+                ],
+                "summary": "Get not Returned books for user",
+                "operationId": "Get not Returned books",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/model.UserBorrow"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/getNotReturnedSum": {
+            "get": {
+                "description": "Get not Returned books with sum",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "borrow"
+                ],
+                "summary": "Get not Returned books with sum",
+                "operationId": "Get not Returned books wtih sum",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/model.CurrentBooks"
                             }
                         }
                     }
@@ -149,11 +268,6 @@ const docTemplate = `{
                 }
             },
             "delete": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
                 "description": "Cancel Transaction",
                 "consumes": [
                     "application/json"
@@ -233,7 +347,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/model.User"
+                            "$ref": "#/definitions/model.UserCreateReq"
                         }
                     }
                 ],
@@ -317,6 +431,42 @@ const docTemplate = `{
                 }
             }
         },
+        "model.BookReq": {
+            "type": "object",
+            "properties": {
+                "author": {
+                    "type": "string"
+                },
+                "price": {
+                    "type": "number"
+                },
+                "title": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.CurrentBooks": {
+            "type": "object",
+            "properties": {
+                "book": {
+                    "$ref": "#/definitions/model.Book"
+                },
+                "sum": {
+                    "type": "number"
+                }
+            }
+        },
+        "model.IncrementBalanceReq": {
+            "type": "object",
+            "properties": {
+                "amount": {
+                    "type": "integer"
+                },
+                "user_id": {
+                    "type": "integer"
+                }
+            }
+        },
         "model.PasswordReq": {
             "type": "object",
             "properties": {
@@ -358,6 +508,9 @@ const docTemplate = `{
                     "type": "number"
                 },
                 "book_id": {
+                    "type": "integer"
+                },
+                "user_id": {
                     "type": "integer"
                 }
             }
@@ -402,6 +555,26 @@ const docTemplate = `{
                 },
                 "user": {
                     "$ref": "#/definitions/model.User"
+                }
+            }
+        },
+        "model.UserCreateReq": {
+            "type": "object",
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "first_name": {
+                    "type": "string"
+                },
+                "last_name": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string"
                 }
             }
         }

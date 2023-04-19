@@ -31,17 +31,18 @@ func NewUserHandler(service *service.Service, jwt *jwt.JWTAuth, logger logger.Re
 // @Tags         user
 // @Accept       json
 // @Produce      json
-// @Param        rq   body      model.User  true  "Входящие данные"
+// @Param        rq   body      model.UserCreateReq  true  "Входящие данные"
 // @Success	     200  {object}  model.User
 // @Router       /user [post]
 func (h *UserHandler) Create(c echo.Context) error {
 	h.logger.Logger(c.Request().Context()).Info("creating user...")
-	var user model.User
+	var user model.UserCreateReq
 	if err := c.Bind(&user); err != nil {
 		h.logger.Logger(c.Request().Context()).Error(err)
 		return err
 	}
-	usr, err := h.service.User.Create(c.Request().Context(), user)
+
+	usr, err := h.service.User.Create(c.Request().Context(), *user.MapperToUser())
 
 	if err != nil {
 		switch {

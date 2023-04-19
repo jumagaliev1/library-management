@@ -9,6 +9,7 @@ import (
 	"github.com/jumagaliev1/one_edu/internal/logger"
 	"github.com/jumagaliev1/one_edu/internal/model"
 	"github.com/jumagaliev1/one_edu/internal/storage"
+	pb "github.com/jumagaliev1/one_edu/proto"
 	"golang.org/x/crypto/bcrypt"
 	"math/rand"
 	"time"
@@ -18,10 +19,11 @@ type UserService struct {
 	repo   *storage.Storage
 	cfg    config.Config
 	logger logger.RequestLogger
+	grpc   pb.TransactionServiceClient
 }
 
-func NewUserService(repo *storage.Storage, cfg config.Config, logger logger.RequestLogger) *UserService {
-	return &UserService{repo: repo, cfg: cfg, logger: logger}
+func NewUserService(repo *storage.Storage, cfg config.Config, logger logger.RequestLogger, grpc pb.TransactionServiceClient) *UserService {
+	return &UserService{repo: repo, cfg: cfg, logger: logger, grpc: grpc}
 }
 
 func (s *UserService) Create(ctx context.Context, user model.User) (*model.User, error) {
@@ -29,10 +31,21 @@ func (s *UserService) Create(ctx context.Context, user model.User) (*model.User,
 	user.Password, err = s.HashPassword(user.Password)
 	//s.logger.Logger(ctx).Info("User password hash", user.Password)
 	if err != nil {
-		//s.logger.Logger(ctx).Error(err)
+		s.logger.Logger(ctx).Error(err)
 		return nil, err
 	}
-	return s.repo.User.Create(ctx, user)
+	u, err := s.repo.User.Create(ctx, user)
+	if err != nil {
+		return nil, err
+	}
+
+	req := &pb.AccountRequest{UserId: int32(u.ID)}
+	_, err = s.grpc.CreateAccount(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+
+	return u, nil
 }
 
 func (s *UserService) Update(ctx context.Context, user model.User) error {

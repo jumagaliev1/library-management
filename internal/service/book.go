@@ -30,3 +30,7 @@ func (s *BookService) Create(ctx context.Context, book model.Book) (*model.Book,
 func (s *BookService) GetByTitle(ctx context.Context, title string) (*model.Book, error) {
 	return s.repo.Book.GetByTitle(ctx, title)
 }
+
+func (s *BookService) GetAll(ctx context.Context) ([]model.Book, error) {
+	return s.repo.Book.GetAll(ctx)
+}

@@ -9,6 +9,9 @@ import (
 	http "github.com/jumagaliev1/one_edu/internal/transport"
 	"github.com/jumagaliev1/one_edu/internal/transport/http/handler"
 	"github.com/jumagaliev1/one_edu/internal/transport/middleware"
+	pb "github.com/jumagaliev1/one_edu/proto"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 )
 
 type App struct {
@@ -29,17 +32,25 @@ func (a *App) Run(ctx context.Context) error {
 		return err
 	}
 
-	svc, svcErr := service.New(stg, *a.cfg, a.logger)
+	conn, err := grpc.Dial(a.cfg.Server.GRPC, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		return err
+	}
+	defer conn.Close()
+	grpcServer := pb.NewTransactionServiceClient(conn)
+
+	svc, svcErr := service.New(stg, *a.cfg, a.logger, grpcServer)
 	if svcErr != nil {
 		return svcErr
 	}
 	jwtAuth := middleware.NewJWTAuth(a.cfg, svc.User)
-	h, err := handler.New(svc, jwtAuth, a.logger)
+	h, err := handler.New(svc, jwtAuth, a.logger, grpcServer)
 	if err != nil {
 		return err
 	}
 	mdlware := middleware.Middleware{}
-	HTTPServer := http.NewServer(a.cfg, h, jwtAuth, mdlware)
+
+	HTTPServer := http.NewServer(a.cfg, h, jwtAuth, mdlware, grpcServer)
 
 	return HTTPServer.StartHTTPServer(ctx)
 }

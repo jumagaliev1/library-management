@@ -5,6 +5,7 @@ import (
 	"github.com/jumagaliev1/one_edu/internal/config"
 	"github.com/jumagaliev1/one_edu/internal/logger"
 	"github.com/jumagaliev1/one_edu/internal/storage"
+	pb "github.com/jumagaliev1/one_edu/proto"
 	"time"
 )
 
@@ -13,27 +14,26 @@ const (
 )
 
 type Service struct {
-	User        IUserService
-	Book        IBookService
-	Borrow      IBorrowService
-	UserBorrow  IUserBorrowService
-	Transaction ITransactionService
+	User            IUserService
+	Book            IBookService
+	Borrow          IBorrowService
+	UserBorrow      IUserBorrowService
+	TransactionGRPS pb.TransactionServiceClient
 }
 
-func New(repo *storage.Storage, cfg config.Config, logger logger.RequestLogger) (*Service, error) {
+func New(repo *storage.Storage, cfg config.Config, logger logger.RequestLogger, transGRPS pb.TransactionServiceClient) (*Service, error) {
 	if repo == nil {
 		return nil, errors.New("No storage")
 	}
-	usrService := NewUserService(repo, cfg, logger)
+	usrService := NewUserService(repo, cfg, logger, transGRPS)
 	bkService := NewBookService(repo, cfg, logger)
 	borrowService := NewBorrowService(repo, cfg, logger)
 	userBorrowService := NewUserBorrowService(repo, logger)
-	transService := NewTransactionService(repo, usrService, logger)
 	return &Service{
-		User:        usrService,
-		Book:        bkService,
-		Borrow:      borrowService,
-		UserBorrow:  userBorrowService,
-		Transaction: transService,
+		User:            usrService,
+		Book:            bkService,
+		Borrow:          borrowService,
+		UserBorrow:      userBorrowService,
+		TransactionGRPS: transGRPS,
 	}, nil
 }

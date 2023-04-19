@@ -18,6 +18,29 @@ definitions:
       title:
         type: string
     type: object
+  model.BookReq:
+    properties:
+      author:
+        type: string
+      price:
+        type: number
+      title:
+        type: string
+    type: object
+  model.CurrentBooks:
+    properties:
+      book:
+        $ref: '#/definitions/model.Book'
+      sum:
+        type: number
+    type: object
+  model.IncrementBalanceReq:
+    properties:
+      amount:
+        type: integer
+      user_id:
+        type: integer
+    type: object
   model.PasswordReq:
     properties:
       old_password:
@@ -45,6 +68,8 @@ definitions:
       amount:
         type: number
       book_id:
+        type: integer
+      user_id:
         type: integer
     type: object
   model.User:
@@ -74,6 +99,19 @@ definitions:
         type: array
       user:
         $ref: '#/definitions/model.User'
+    type: object
+  model.UserCreateReq:
+    properties:
+      email:
+        type: string
+      first_name:
+        type: string
+      last_name:
+        type: string
+      password:
+        type: string
+      username:
+        type: string
     type: object
 host: localhost:8000
 info:
@@ -108,7 +146,86 @@ paths:
       summary: Auth get JWT token
       tags:
       - user
-  /getHasBookUsers:
+  /balance:
+    post:
+      consumes:
+      - application/json
+      description: Increment Balance
+      operationId: IncrementBalance
+      parameters:
+      - description: Входящие данные
+        in: body
+        name: rq
+        required: true
+        schema:
+          $ref: '#/definitions/model.IncrementBalanceReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      summary: Increment Balance
+      tags:
+      - transaction
+  /book:
+    get:
+      consumes:
+      - application/json
+      description: Get all Book
+      operationId: GetAllBook
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      summary: Get all Book
+      tags:
+      - book
+    post:
+      consumes:
+      - application/json
+      description: Create Book
+      operationId: CreateBook
+      parameters:
+      - description: Входящие данные
+        in: body
+        name: rq
+        required: true
+        schema:
+          $ref: '#/definitions/model.BookReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      summary: Create Book
+      tags:
+      - book
+  /getLastMonthly:
+    get:
+      consumes:
+      - application/json
+      description: Get Books borrowed last month
+      operationId: Get Books borrowed last month
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/model.UserBorrow'
+            type: array
+      summary: Get Books borrowed last month
+      tags:
+      - borrow
+  /getNotReturned:
     get:
       consumes:
       - application/json
@@ -126,12 +243,12 @@ paths:
       summary: Get not Returned books for user
       tags:
       - borrow
-  /getLastMonthly:
+  /getNotReturnedSum:
     get:
       consumes:
       - application/json
-      description: Get Books borrowed last month
-      operationId: Get Books borrowed last month
+      description: Get not Returned books with sum
+      operationId: Get not Returned books wtih sum
       produces:
       - application/json
       responses:
@@ -139,9 +256,9 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/model.UserBorrow'
+              $ref: '#/definitions/model.CurrentBooks'
             type: array
-      summary: Get Books borrowed last month
+      summary: Get not Returned books with sum
       tags:
       - borrow
   /transaction:
@@ -163,8 +280,6 @@ paths:
           description: OK
           schema:
             type: string
-      security:
-      - ApiKeyAuth: []
       summary: Cancel Transaction
       tags:
       - transaction
@@ -221,7 +336,7 @@ paths:
         name: rq
         required: true
         schema:
-          $ref: '#/definitions/model.User'
+          $ref: '#/definitions/model.UserCreateReq'
       produces:
       - application/json
       responses:

@@ -17,6 +17,7 @@ type ServerConfig struct {
 	Host            string
 	Port            int
 	ShutdownTimeout time.Duration
+	GRPC            string
 }
 type PostgresConfig struct {
 	Username    string
@@ -46,6 +47,7 @@ func (c PostgresConfig) URI() string {
 
 func Init(cfg *Config) {
 	cfg.Server.Host = os.Getenv("SERVER_HOST")
+	cfg.Server.GRPC = os.Getenv("GRPS_HOST")
 
 	cfg.Postgres.Username = os.Getenv("POSTGRES_USERNAME")
 	cfg.Postgres.Password = os.Getenv("POSTGRES_PASSWORD")

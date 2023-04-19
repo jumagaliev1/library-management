@@ -6,6 +6,7 @@ import (
 	"github.com/jumagaliev1/one_edu/internal/config"
 	"github.com/jumagaliev1/one_edu/internal/transport/http/handler"
 	middleware "github.com/jumagaliev1/one_edu/internal/transport/middleware"
+	pb "github.com/jumagaliev1/one_edu/proto"
 	"github.com/labstack/echo/v4"
 	echoMiddleware "github.com/labstack/echo/v4/middleware"
 	"github.com/labstack/gommon/log"
@@ -19,16 +20,15 @@ type Server struct {
 	handler    *handler.Handler
 	jwt        *middleware.JWTAuth
 	middleware middleware.Middleware
+	grpc       pb.TransactionServiceClient
 }
 
-func NewServer(cfg *config.Config, handler *handler.Handler, jwt *middleware.JWTAuth, midlwr middleware.Middleware) *Server {
-	return &Server{cfg: cfg, handler: handler, jwt: jwt, middleware: midlwr}
+func NewServer(cfg *config.Config, handler *handler.Handler, jwt *middleware.JWTAuth, midlwr middleware.Middleware, grpc pb.TransactionServiceClient) *Server {
+	return &Server{cfg: cfg, handler: handler, jwt: jwt, middleware: midlwr, grpc: grpc}
 }
 
 func (s *Server) StartHTTPServer(ctx context.Context) error {
 	s.App = s.BuildEngine()
-	//c := jaegertracing.New(s.App, nil)
-	//defer c.Close()
 	s.SetupRoutes()
 
 	go func() {

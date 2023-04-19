@@ -1,0 +1,46 @@
+syntax = "proto3";
+option go_package = "transactions/";
+package transactions;
+
+service TransactionService {
+  rpc Create(CreateTransRequest) returns (CreateTransResponse) {}
+  rpc Cancel(CancelTransRequest) returns (CancelTransResponse) {}
+  rpc CreateAccount(AccountRequest) returns (AccountResponse) {}
+  rpc IncrementBalance(BalanceRequest) returns (AccountResponse) {}
+}
+
+message CreateTransRequest {
+  Transaction transaction = 1;
+}
+
+message CreateTransResponse {
+  uint32 id = 1;
+}
+
+message CancelTransRequest {
+  int32 transactionID = 2;
+}
+
+message CancelTransResponse {
+}
+
+message Transaction {
+  uint32 id = 1;
+  uint32 item_id = 2;
+  uint32 user_id = 3;
+  int32 price = 4;
+}
+
+message AccountRequest {
+  int32 user_id = 1;
+}
+
+message AccountResponse {
+  int32 id = 1;
+}
+
+message BalanceRequest {
+  int32 user_id = 1;
+  int32 amount = 2;
+}
+

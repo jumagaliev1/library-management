@@ -37,6 +37,25 @@ func (h *BorrowHandler) Create(c echo.Context) error {
 	return c.JSON(http.StatusOK, borrow)
 }
 
+// GetNotReturned with Sum godoc
+// @Summary      Get not Returned books with sum
+// @Description  Get not Returned books with sum
+// @ID           Get not Returned books wtih sum
+// @Tags         borrow
+// @Accept       json
+// @Produce      json
+// @Success	     200  {object}  []model.CurrentBooks
+// @Router       /getNotReturnedSum [get]
+func (h *BorrowHandler) SumOfBooks(c echo.Context) error {
+	borrows, err := h.service.UserBorrow.GetCurrentBooks(c.Request().Context())
+	if err != nil {
+		h.logger.Logger(c.Request().Context()).Error(err)
+		return err
+	}
+
+	return c.JSON(http.StatusOK, borrows)
+}
+
 // GetNotReturned godoc
 // @Summary      Get not Returned books for user
 // @Description  Get not Returned books for user
@@ -45,7 +64,7 @@ func (h *BorrowHandler) Create(c echo.Context) error {
 // @Accept       json
 // @Produce      json
 // @Success	     200  {object}  []model.UserBorrow
-// @Router       /getHasBookUsers [get]
+// @Router       /getNotReturned [get]
 func (h *BorrowHandler) GetNotReturned(c echo.Context) error {
 	borrows, err := h.service.UserBorrow.GetCurrentHaveBooks(c.Request().Context())
 	if err != nil {

@@ -7,5 +7,5 @@ type Borrow struct {
 	BookID   uint
 	UserID   uint
 	Borrowed time.Time
-	Returned time.Time
+	Returned *time.Time
 }

@@ -57,3 +57,13 @@ func (r *BookRepository) GetByID(ctx context.Context, ID uint) (*model.Book, err
 	}
 	return &book, nil
 }
+
+func (r *BookRepository) GetAll(ctx context.Context) ([]model.Book, error) {
+	var books []model.Book
+	if err := r.DB.WithContext(ctx).Find(&books).Error; err != nil {
+		r.logger.Logger(ctx).Error(err)
+		return nil, err
+	}
+
+	return books, nil
+}

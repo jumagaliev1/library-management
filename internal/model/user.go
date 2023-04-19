@@ -35,6 +35,16 @@ type UserCreateReq struct {
 	Password  string `json:"password"`
 }
 
+func (u *UserCreateReq) MapperToUser() *User {
+	return &User{
+		FirstName: u.FirstName,
+		LastName:  u.LastName,
+		Username:  u.Username,
+		Email:     u.Email,
+		Password:  u.Password,
+	}
+}
+
 type AuthUser struct {
 	Username string `json:"username"`
 	Password string `json:"password"`

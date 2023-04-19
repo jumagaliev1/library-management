@@ -15,6 +15,32 @@ type UserBorrowService struct {
 func NewUserBorrowService(repo *storage.Storage, logger logger.RequestLogger) *UserBorrowService {
 	return &UserBorrowService{repo: repo, logger: logger}
 }
+func (s *UserBorrowService) GetCurrentBooks(ctx context.Context) ([]model.CurrentBooks, error) {
+	borrows, err := s.repo.Borrow.GetNoReturned(ctx)
+	if err != nil {
+		s.logger.Logger(ctx).Error(err)
+		return nil, err
+	}
+
+	currentBorrows := make(map[model.Book]float32)
+
+	for _, v := range borrows {
+		book, err := s.repo.Book.GetByID(ctx, v.BookID)
+		if err != nil {
+			s.logger.Logger(ctx).Error(err)
+			return nil, err
+		}
+		currentBorrows[*book] += book.Price
+	}
+
+	var res []model.CurrentBooks
+
+	for book, v := range currentBorrows {
+		res = append(res, model.CurrentBooks{Book: book, Sum: v})
+	}
+
+	return res, nil
+}
 
 func (s *UserBorrowService) GetCurrentHaveBooks(ctx context.Context) ([]model.UserBorrow, error) {
 	borrows, err := s.repo.Borrow.GetNoReturned(ctx)

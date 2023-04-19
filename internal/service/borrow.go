@@ -20,6 +20,7 @@ func NewBorrowService(repo *storage.Storage, cfg config.Config, logger logger.Re
 
 func (s *BorrowService) Create(ctx context.Context, borrow model.Borrow) (*model.Borrow, error) {
 	s.logger.Logger(ctx).Info(borrow)
+
 	return s.repo.Borrow.Create(ctx, borrow)
 }
 

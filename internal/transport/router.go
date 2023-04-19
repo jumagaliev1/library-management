@@ -20,13 +20,18 @@ func (s *Server) SetupRoutes() *echo.Group {
 	v1.GET("/user", s.handler.User.Get, s.jwt.ValidateAuth)
 	v1.POST("/user/password", s.handler.User.ChangePassword, s.jwt.ValidateAuth)
 
+	v1.GET("/book", s.handler.Book.GetAll)
+	v1.POST("/book", s.handler.Book.Create)
+
 	v1.POST("/auth", s.handler.User.Auth)
 
-	v1.GET("/getHasBookUsers", s.handler.Borrow.GetNotReturned)
+	v1.GET("/getNotReturned", s.handler.Borrow.GetNotReturned)
+	v1.GET("/getNotReturnedSum", s.handler.Borrow.SumOfBooks)
 	v1.GET("/getLastMonthly", s.handler.Borrow.GetByLastMonth)
 
 	v1.POST("/transaction", s.handler.Transaction.Create, s.jwt.ValidateAuth)
 	v1.DELETE("/transaction/:id", s.handler.Transaction.Cancel, s.jwt.ValidateAuth)
+	v1.POST("/balance", s.handler.Transaction.IncrementBalance)
 
 	s.App.GET("/swagger/*", echoSwagger.WrapHandler)
 

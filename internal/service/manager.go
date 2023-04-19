@@ -24,6 +24,7 @@ type IUserService interface {
 type IBookService interface {
 	Create(ctx context.Context, book model.Book) (*model.Book, error)
 	GetByTitle(ctx context.Context, title string) (*model.Book, error)
+	GetAll(ctx context.Context) ([]model.Book, error)
 }
 
 type IBorrowService interface {
@@ -33,6 +34,7 @@ type IBorrowService interface {
 }
 
 type IUserBorrowService interface {
+	GetCurrentBooks(ctx context.Context) ([]model.CurrentBooks, error)
 	GetCurrentHaveBooks(ctx context.Context) ([]model.UserBorrow, error)
 	GetUserBookLastMonthly(ctx context.Context) ([]model.UserBorrow, error)
 }
