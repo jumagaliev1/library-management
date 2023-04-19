@@ -1,4 +1,3 @@
-basePath: /api/v1
 definitions:
   model.AuthUser:
     properties:
@@ -113,15 +112,8 @@ definitions:
       username:
         type: string
     type: object
-host: localhost:8000
 info:
-  contact:
-    email: alibi.zhumagaliyev@gmail.com
-    name: Alibi Zhumagaliyev
-    url: '@AZhumagaliyev'
-  description: This is a sample server for homework demo server.
-  title: OneLab Homework API
-  version: "1.0"
+  contact: {}
 paths:
   /auth:
     post:
@@ -302,8 +294,6 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/model.Transaction'
-      security:
-      - ApiKeyAuth: []
       summary: Create Transaction
       tags:
       - transaction
@@ -372,10 +362,4 @@ paths:
       summary: Change Password for user
       tags:
       - user
-securityDefinitions:
-  ApiKeyAuth:
-    description: OAuth protects our entity endpoints
-    in: header
-    name: Authorization
-    type: apiKey
 swagger: "2.0"

@@ -1,17 +1,8 @@
 {
     "swagger": "2.0",
     "info": {
-        "description": "This is a sample server for homework demo server.",
-        "title": "OneLab Homework API",
-        "contact": {
-            "name": "Alibi Zhumagaliyev",
-            "url": "@AZhumagaliyev",
-            "email": "alibi.zhumagaliyev@gmail.com"
-        },
-        "version": "1.0"
+        "contact": {}
     },
-    "host": "localhost:8000",
-    "basePath": "/api/v1",
     "paths": {
         "/auth": {
             "post": {
@@ -223,11 +214,6 @@
         },
         "/transaction": {
             "post": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
                 "description": "Create Transaction",
                 "consumes": [
                     "application/json"
@@ -570,14 +556,6 @@
                     "type": "string"
                 }
             }
-        }
-    },
-    "securityDefinitions": {
-        "ApiKeyAuth": {
-            "description": "OAuth protects our entity endpoints",
-            "type": "apiKey",
-            "name": "Authorization",
-            "in": "header"
         }
     }
 }

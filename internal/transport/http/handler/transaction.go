@@ -29,7 +29,6 @@ func NewTransactionHandler(grpc pb.TransactionServiceClient, logger logger.Reque
 // @Summary      Create Transaction
 // @Description  Create Transaction
 // @ID           CreateTransaction
-// @Security	ApiKeyAuth
 // @Tags         transaction
 // @Accept       json
 // @Produce      json
